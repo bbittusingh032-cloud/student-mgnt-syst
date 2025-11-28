@@ -172,7 +172,7 @@ const Navbar = ({ currentPage, setCurrentPage, onLogout }) => {
     <nav className="bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between py-4">
-          <h1 className="text-2xl font-bold">SMS Portal</h1>
+          <h1 className="text-2xl font-bold">IIMT StudentPortal</h1>
           <div className="flex space-x-1">
             {navItems.map(item => (
               <button
@@ -278,20 +278,100 @@ const RegisterStudent = ({ onAdd, setCurrentPage }) => {
     course: '',
     address: ''
   });
+  const [errors, setErrors] = useState({});
+
+  const validateName = (name) => {
+    const nameRegex = /^[a-zA-Z\s]+$/;
+    if (!name.trim()) {
+      return 'Name is required';
+    }
+    if (!nameRegex.test(name)) {
+      return 'Name should only contain letters and spaces';
+    }
+    if (name.trim().length < 2) {
+      return 'Name should be at least 2 characters';
+    }
+    return '';
+  };
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!email.trim()) {
+      return 'Email is required';
+    }
+    if (!emailRegex.test(email)) {
+      return 'Please enter a valid email address';
+    }
+    return '';
+  };
+
+  const validatePhone = (phone) => {
+    const phoneRegex = /^[6-9]\d{9}$/;
+    if (!phone.trim()) {
+      return 'Phone number is required';
+    }
+    if (!phoneRegex.test(phone)) {
+      return 'Please enter a valid 10-digit Indian mobile number';
+    }
+    return '';
+  };
+
+  const validateRollNo = (rollNo) => {
+    const rollNoRegex = /^[A-Z0-9]{4,15}$/;
+    if (!rollNo.trim()) {
+      return 'Roll number is required';
+    }
+    if (!rollNoRegex.test(rollNo.toUpperCase())) {
+      return 'Roll number should be 4-15 characters (letters and numbers only)';
+    }
+    return '';
+  };
 
   const handleSubmit = () => {
-    if (formData.rollNo && formData.name && formData.email && formData.phone && formData.course) {
+    const newErrors = {};
+    
+    newErrors.name = validateName(formData.name);
+    newErrors.email = validateEmail(formData.email);
+    newErrors.phone = validatePhone(formData.phone);
+
+    if (!formData.rollNo.trim()) newErrors.rollNo = 'Roll number is required';
+    if (!formData.course) newErrors.course = 'Course is required';
+
+    setErrors(newErrors);
+
+    const hasErrors = Object.values(newErrors).some(error => error !== '');
+    
+    if (!hasErrors) {
       onAdd(formData);
       setFormData({ rollNo: '', name: '', email: '', phone: '', course: '', address: '' });
+      setErrors({});
       alert('Student registered successfully!');
       setCurrentPage('student-list');
-    } else {
-      alert('Please fill all required fields');
     }
   };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    
+    if (name === 'name') {
+      const filteredValue = value.replace(/[0-9]/g, '');
+      setFormData({ ...formData, [name]: filteredValue });
+      if (filteredValue !== value) {
+        setErrors({ ...errors, [name]: 'Numbers are not allowed in name' });
+      } else {
+        setErrors({ ...errors, [name]: validateName(filteredValue) });
+      }
+    } else if (name === 'phone') {
+      const filteredValue = value.replace(/[^0-9]/g, '').slice(0, 10);
+      setFormData({ ...formData, [name]: filteredValue });
+      setErrors({ ...errors, [name]: validatePhone(filteredValue) });
+    } else if (name === 'email') {
+      setFormData({ ...formData, [name]: value });
+      setErrors({ ...errors, [name]: validateEmail(value) });
+    } else {
+      setFormData({ ...formData, [name]: value });
+      setErrors({ ...errors, [name]: '' });
+    }
   };
 
   return (
@@ -306,9 +386,11 @@ const RegisterStudent = ({ onAdd, setCurrentPage }) => {
               name="rollNo"
               value={formData.rollNo}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                errors.rollNo ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+              }`}
             />
+            {errors.rollNo && <p className="text-red-500 text-xs mt-1">{errors.rollNo}</p>}
           </div>
           <div>
             <label className="block text-gray-700 text-sm font-bold mb-2">Full Name *</label>
@@ -317,9 +399,12 @@ const RegisterStudent = ({ onAdd, setCurrentPage }) => {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
+              placeholder="e.g., John Doe"
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                errors.name ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+              }`}
             />
+            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
           </div>
           <div>
             <label className="block text-gray-700 text-sm font-bold mb-2">Email *</label>
@@ -328,9 +413,12 @@ const RegisterStudent = ({ onAdd, setCurrentPage }) => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
+              placeholder="e.g., student@gmail.com"
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                errors.email ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+              }`}
             />
+            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
           </div>
           <div>
             <label className="block text-gray-700 text-sm font-bold mb-2">Phone *</label>
@@ -339,9 +427,13 @@ const RegisterStudent = ({ onAdd, setCurrentPage }) => {
               name="phone"
               value={formData.phone}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
+              placeholder="e.g., 9876543210"
+              maxLength="10"
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                errors.phone ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+              }`}
             />
+            {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
           </div>
           <div>
             <label className="block text-gray-700 text-sm font-bold mb-2">Course *</label>
@@ -392,6 +484,43 @@ const UpdateRecord = ({ students, onUpdate }) => {
     course: '',
     address: ''
   });
+  const [errors, setErrors] = useState({});
+
+  const validateName = (name) => {
+    const nameRegex = /^[a-zA-Z\s]+$/;
+    if (!name.trim()) {
+      return 'Name is required';
+    }
+    if (!nameRegex.test(name)) {
+      return 'Name should only contain letters and spaces';
+    }
+    if (name.trim().length < 2) {
+      return 'Name should be at least 2 characters';
+    }
+    return '';
+  };
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!email.trim()) {
+      return 'Email is required';
+    }
+    if (!emailRegex.test(email)) {
+      return 'Please enter a valid email address';
+    }
+    return '';
+  };
+
+  const validatePhone = (phone) => {
+    const phoneRegex = /^[6-9]\d{9}$/;
+    if (!phone.trim()) {
+      return 'Phone number is required';
+    }
+    if (!phoneRegex.test(phone)) {
+      return 'Please enter a valid 10-digit Indian mobile number';
+    }
+    return '';
+  };
 
   const handleStudentSelect = (e) => {
     const id = parseInt(e.target.value);
@@ -399,21 +528,54 @@ const UpdateRecord = ({ students, onUpdate }) => {
     const student = students.find(s => s.id === id);
     if (student) {
       setFormData(student);
+      setErrors({});
     }
   };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    
+    if (name === 'name') {
+      const filteredValue = value.replace(/[0-9]/g, '');
+      setFormData({ ...formData, [name]: filteredValue });
+      if (filteredValue !== value) {
+        setErrors({ ...errors, [name]: 'Numbers are not allowed in name' });
+      } else {
+        setErrors({ ...errors, [name]: validateName(filteredValue) });
+      }
+    } else if (name === 'phone') {
+      const filteredValue = value.replace(/[^0-9]/g, '').slice(0, 10);
+      setFormData({ ...formData, [name]: filteredValue });
+      setErrors({ ...errors, [name]: validatePhone(filteredValue) });
+    } else if (name === 'email') {
+      setFormData({ ...formData, [name]: value });
+      setErrors({ ...errors, [name]: validateEmail(value) });
+    } else {
+      setFormData({ ...formData, [name]: value });
+      setErrors({ ...errors, [name]: '' });
+    }
   };
 
   const handleSubmit = () => {
-    if (formData.rollNo && formData.name && formData.email && formData.phone && formData.course) {
+    const newErrors = {};
+    
+    newErrors.name = validateName(formData.name);
+    newErrors.email = validateEmail(formData.email);
+    newErrors.phone = validatePhone(formData.phone);
+
+    if (!formData.rollNo.trim()) newErrors.rollNo = 'Roll number is required';
+    if (!formData.course) newErrors.course = 'Course is required';
+
+    setErrors(newErrors);
+
+    const hasErrors = Object.values(newErrors).some(error => error !== '');
+    
+    if (!hasErrors) {
       onUpdate(selectedId, formData);
       alert('Student record updated successfully!');
       setSelectedId('');
       setFormData({ rollNo: '', name: '', email: '', phone: '', course: '', address: '' });
-    } else {
-      alert('Please fill all required fields');
+      setErrors({});
     }
   };
 
@@ -448,9 +610,11 @@ const UpdateRecord = ({ students, onUpdate }) => {
                   name="rollNo"
                   value={formData.rollNo}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                    errors.rollNo ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+                  }`}
                 />
+                {errors.rollNo && <p className="text-red-500 text-xs mt-1">{errors.rollNo}</p>}
               </div>
               <div>
                 <label className="block text-gray-700 text-sm font-bold mb-2">Full Name</label>
@@ -459,9 +623,12 @@ const UpdateRecord = ({ students, onUpdate }) => {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
+                  placeholder="e.g., John Doe"
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                    errors.name ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+                  }`}
                 />
+                {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
               </div>
               <div>
                 <label className="block text-gray-700 text-sm font-bold mb-2">Email</label>
@@ -470,9 +637,12 @@ const UpdateRecord = ({ students, onUpdate }) => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
+                  placeholder="e.g., student@gmail.com"
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                    errors.email ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+                  }`}
                 />
+                {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
               </div>
               <div>
                 <label className="block text-gray-700 text-sm font-bold mb-2">Phone</label>
@@ -481,9 +651,13 @@ const UpdateRecord = ({ students, onUpdate }) => {
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
+                  placeholder="e.g., 9876543210"
+                  maxLength="10"
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                    errors.phone ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+                  }`}
                 />
+                {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
               </div>
               <div>
                 <label className="block text-gray-700 text-sm font-bold mb-2">Course</label>
