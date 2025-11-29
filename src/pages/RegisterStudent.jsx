@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { toast } from "react-toastify";
 import { UserPlus } from "lucide-react";
 
 const RegisterStudent = ({ onAdd, setCurrentPage }) => {
@@ -65,26 +66,55 @@ const RegisterStudent = ({ onAdd, setCurrentPage }) => {
     setErrors({ ...errors, [name]: "" });
   };
 
-  const handleSubmit = () => {
-    const newErrors = {
-      rollNo: validateRollNo(formData.rollNo),
-      name: validateName(formData.name),
-      email: validateEmail(formData.email),
-      phone: validatePhone(formData.phone),
-    };
-    if (!formData.course) newErrors.course = "Course is required";
-
-    setErrors(newErrors);
-    const hasErrors = Object.values(newErrors).some((e) => e && e.length > 0);
-
-    if (!hasErrors) {
-      onAdd(formData);
-      setFormData({ rollNo: "", name: "", email: "", phone: "", course: "", address: "" });
-      setErrors({});
-      alert("Student registered successfully!");
-      setCurrentPage("student-list");
-    }
+const handleSubmit = () => {
+  const newErrors = {
+    rollNo: validateRollNo(formData.rollNo),
+    name: validateName(formData.name),
+    email: validateEmail(formData.email),
+    phone: validatePhone(formData.phone),
   };
+
+  if (!formData.course) newErrors.course = "Course is required";
+
+  setErrors(newErrors);
+
+  const hasErrors = Object.values(newErrors).some(
+    (e) => e && e.length > 0
+  );
+
+  if (hasErrors) {
+    toast.error("Please fix the errors!", {
+      position: "top-center",
+      autoClose: 2000,
+    });
+    return;
+  }
+
+  // ADD STUDENT
+  onAdd(formData);
+
+  // RESET FORM
+  setFormData({
+    rollNo: "",
+    name: "",
+    email: "",
+    phone: "",
+    course: "",
+    address: "",
+  });
+
+  setErrors({});
+
+  // SUCCESS TOAST
+  toast.success("Student registered successfully!", {
+    position: "top-center",
+    autoClose: 2000,
+  });
+
+  setCurrentPage("student-list");
+};
+
+
 
   return (
     <div className="max-w-3xl mx-auto animate-fadeIn">

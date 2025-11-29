@@ -8,6 +8,12 @@ import LoginPage from "./pages/LoginPage";
 import StudentList from "./pages/StudentList";
 import RegisterStudent from "./pages/RegisterStudent";
 import UpdateRecord from "./pages/UpdateRecord";
+import { toast } from "react-toastify";
+
+
+// ✅ Import Toastify
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const App = () => {
   const [currentPage, setCurrentPage] = useState("login");
@@ -35,6 +41,7 @@ const App = () => {
       localStorage.setItem("isLoggedIn", "true");
       setIsLoggedIn(true);
       setCurrentPage("student-list");
+
       const stored = localStorage.getItem("students");
       if (stored) setStudents(JSON.parse(stored));
       return true;
@@ -59,10 +66,15 @@ const App = () => {
     saveStudents(updated);
   };
 
-  const deleteStudent = (id) => {
-    const updated = students.filter((s) => s.id !== id);
-    saveStudents(updated);
-  };
+ const deleteStudent = (id) => {
+  const updated = students.filter((s) => s.id !== id);
+  saveStudents(updated);
+
+  toast.info("Student record deleted!", {
+    position: "top-center",
+    autoClose: 1800,
+  });
+};
 
   const filteredStudents = students.filter((s) =>
     [s.name, s.rollNo, s.email].some((field) =>
@@ -99,6 +111,17 @@ const App = () => {
       </main>
 
       <Footer />
+
+      {/* ✅ Toast Container (Always visible for notifications) */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 };

@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Edit } from "lucide-react";
+import { toast } from "react-toastify";
+
 
 const UpdateRecord = ({ students, onUpdate }) => {
   const [selectedId, setSelectedId] = useState("");
@@ -69,24 +71,50 @@ const UpdateRecord = ({ students, onUpdate }) => {
   };
 
   const handleSubmit = () => {
-    const newErrors = {};
-    newErrors.name = validateName(formData.name);
-    newErrors.email = validateEmail(formData.email);
-    newErrors.phone = validatePhone(formData.phone);
-    if (!formData.rollNo.trim()) newErrors.rollNo = "Roll number is required";
-    if (!formData.course) newErrors.course = "Course is required";
+  const newErrors = {};
+  newErrors.name = validateName(formData.name);
+  newErrors.email = validateEmail(formData.email);
+  newErrors.phone = validatePhone(formData.phone);
 
-    setErrors(newErrors);
-    const hasErrors = Object.values(newErrors).some((e) => e && e.length > 0);
+  if (!formData.rollNo.trim()) newErrors.rollNo = "Roll number is required";
+  if (!formData.course) newErrors.course = "Course is required";
 
-    if (!hasErrors) {
-      onUpdate(selectedId, formData);
-      alert("Student record updated successfully!");
-      setSelectedId("");
-      setFormData({ rollNo: "", name: "", email: "", phone: "", course: "", address: "" });
-      setErrors({});
-    }
-  };
+  setErrors(newErrors);
+
+  const hasErrors = Object.values(newErrors).some(
+    (e) => e && e.length > 0
+  );
+
+  if (hasErrors) {
+    toast.error("Please fix the errors!", {
+      position: "top-center",
+      autoClose: 2000,
+    });
+    return;
+  }
+
+  // UPDATE STUDENT
+  onUpdate(selectedId, formData);
+
+  // SUCCESS TOAST
+  toast.success("Student record updated successfully!", {
+    position: "top-center",
+    autoClose: 2000,
+  });
+
+  // RESET FORM + RESET SELECT
+  setSelectedId("");
+  setFormData({
+    rollNo: "",
+    name: "",
+    email: "",
+    phone: "",
+    course: "",
+    address: "",
+  });
+  setErrors({});
+};
+
 
   return (
     <div className="max-w-3xl mx-auto animate-fadeIn">
