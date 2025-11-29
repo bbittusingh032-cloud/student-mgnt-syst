@@ -2,17 +2,30 @@ import React from "react";
 
 const Footer = () => {
   return (
-    <footer className="bg-white border-t mt-8">
+    <footer className="bg-[#D0006F] mt-8 shadow-inner">
       <div className="container mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between">
+        
+        {/* Left Section */}
         <div>
-          <h3 className="text-sm font-semibold">Student Management System</h3>
-          <p className="text-xs text-gray-500">© {new Date().getFullYear()} IIMT. All Rights Reserved.</p>
+          <h3 className="text-sm font-semibold text-white">
+            Student Management System
+          </h3>
+          <p className="text-xs text-pink-100">
+            © {new Date().getFullYear()} IIMT. All Rights Reserved.
+          </p>
         </div>
 
+        {/* Right Section */}
         <div className="flex space-x-4 mt-4 md:mt-0">
-          <a className="text-sm text-gray-600 hover:text-blue-600">About</a>
-          <a className="text-sm text-gray-600 hover:text-blue-600">Contact</a>
-          <a className="text-sm text-gray-600 hover:text-blue-600">Privacy</a>
+          <button className="text-sm text-white/90 hover:text-white transition">
+            About
+          </button>
+          <button className="text-sm text-white/90 hover:text-white transition">
+            Contact
+          </button>
+          <button className="text-sm text-white/90 hover:text-white transition">
+            Privacy
+          </button>
         </div>
       </div>
     </footer>

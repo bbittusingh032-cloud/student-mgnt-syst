@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { UserPlus } from "lucide-react";
 
 const RegisterStudent = ({ onAdd, setCurrentPage }) => {
   const [formData, setFormData] = useState({
@@ -46,7 +47,10 @@ const RegisterStudent = ({ onAdd, setCurrentPage }) => {
     if (name === "name") {
       const filteredValue = value.replace(/[0-9]/g, "");
       setFormData({ ...formData, [name]: filteredValue });
-      setErrors({ ...errors, [name]: validateName(filteredValue) || (filteredValue !== value ? "Numbers are not allowed in name" : "") });
+      setErrors({
+        ...errors,
+        [name]: validateName(filteredValue) || (filteredValue !== value ? "Numbers are not allowed in name" : ""),
+      });
       return;
     }
 
@@ -62,11 +66,12 @@ const RegisterStudent = ({ onAdd, setCurrentPage }) => {
   };
 
   const handleSubmit = () => {
-    const newErrors = {};
-    newErrors.rollNo = validateRollNo(formData.rollNo);
-    newErrors.name = validateName(formData.name);
-    newErrors.email = validateEmail(formData.email);
-    newErrors.phone = validatePhone(formData.phone);
+    const newErrors = {
+      rollNo: validateRollNo(formData.rollNo),
+      name: validateName(formData.name),
+      email: validateEmail(formData.email),
+      phone: validatePhone(formData.phone),
+    };
     if (!formData.course) newErrors.course = "Course is required";
 
     setErrors(newErrors);
@@ -82,56 +87,108 @@ const RegisterStudent = ({ onAdd, setCurrentPage }) => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <h2 className="text-3xl font-bold text-gray-800 mb-6">Register New Student</h2>
+    <div className="max-w-3xl mx-auto animate-fadeIn">
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-6">
+        <UserPlus className="w-8 h-8 text-[#D0006F]" />
+        <h2 className="text-3xl font-extrabold text-gray-800">Register New Student</h2>
+      </div>
 
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white rounded-2xl shadow-xl p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Roll Number */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Roll Number *</label>
-            <input name="rollNo" value={formData.rollNo} onChange={handleChange} className={`w-full px-3 py-2 border rounded ${errors.rollNo ? "border-red-400" : "border-gray-300"} focus:outline-none focus:ring-2 focus:ring-blue-500`} />
+            <input
+              name="rollNo"
+              value={formData.rollNo}
+              onChange={handleChange}
+              className={`w-full px-3 py-2 rounded-xl border shadow-sm focus:outline-none focus:ring-2 focus:ring-[#D0006F] ${errors.rollNo ? "border-red-400" : "border-gray-300"}`}
+            />
             {errors.rollNo && <p className="text-xs text-red-500 mt-1">{errors.rollNo}</p>}
           </div>
 
+          {/* Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
-            <input name="name" value={formData.name} onChange={handleChange} placeholder="e.g., John Doe" className={`w-full px-3 py-2 border rounded ${errors.name ? "border-red-400" : "border-gray-300"} focus:outline-none focus:ring-2 focus:ring-blue-500`} />
+            <input
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="e.g., John Doe"
+              className={`w-full px-3 py-2 rounded-xl border shadow-sm focus:outline-none focus:ring-2 focus:ring-[#D0006F] ${errors.name ? "border-red-400" : "border-gray-300"}`}
+            />
             {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
           </div>
 
+          {/* Email */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
-            <input name="email" value={formData.email} onChange={handleChange} type="email" placeholder="e.g., student@gmail.com" className={`w-full px-3 py-2 border rounded ${errors.email ? "border-red-400" : "border-gray-300"} focus:outline-none focus:ring-2 focus:ring-blue-500`} />
+            <input
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              type="email"
+              placeholder="e.g., student@gmail.com"
+              className={`w-full px-3 py-2 rounded-xl border shadow-sm focus:outline-none focus:ring-2 focus:ring-[#D0006F] ${errors.email ? "border-red-400" : "border-gray-300"}`}
+            />
             {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
           </div>
 
+          {/* Phone */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Phone *</label>
-            <input name="phone" value={formData.phone} onChange={handleChange} type="tel" placeholder="e.g., 9876543210" maxLength="10" className={`w-full px-3 py-2 border rounded ${errors.phone ? "border-red-400" : "border-gray-300"} focus:outline-none focus:ring-2 focus:ring-blue-500`} />
+            <input
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              type="tel"
+              placeholder="e.g., 9876543210"
+              maxLength="10"
+              className={`w-full px-3 py-2 rounded-xl border shadow-sm focus:outline-none focus:ring-2 focus:ring-[#D0006F] ${errors.phone ? "border-red-400" : "border-gray-300"}`}
+            />
             {errors.phone && <p className="text-xs text-red-500 mt-1">{errors.phone}</p>}
           </div>
 
+          {/* Course */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Course *</label>
-            <select name="course" value={formData.course} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <select
+              name="course"
+              value={formData.course}
+              onChange={handleChange}
+              className="w-full px-3 py-2 rounded-xl border shadow-sm focus:outline-none focus:ring-2 focus:ring-[#D0006F] border-gray-300"
+            >
               <option value="">Select Course</option>
               <option>Computer Science</option>
               <option>Information Technology</option>
               <option>Electronics</option>
               <option>Mechanical</option>
-              <option>Civil</option>
+              <option>BCA</option>
+              <option>MBA</option>
+              <option>BBA</option>
             </select>
             {errors.course && <p className="text-xs text-red-500 mt-1">{errors.course}</p>}
           </div>
 
+          {/* Address */}
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
-            <input name="address" value={formData.address} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <input
+              name="address"
+              value={formData.address}
+              onChange={handleChange}
+              className="w-full px-3 py-2 rounded-xl border shadow-sm focus:outline-none focus:ring-2 focus:ring-[#D0006F] border-gray-300"
+            />
           </div>
         </div>
 
+        {/* Submit */}
         <div className="mt-6">
-          <button onClick={handleSubmit} className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:from-blue-700 transition">
+          <button
+            onClick={handleSubmit}
+            className="w-full py-3 bg-gradient-to-r from-[#D0006F] to-pink-600 text-white rounded-2xl font-semibold shadow hover:from-[#a80059] hover:to-pink-700 transition transform hover:scale-105 active:scale-95"
+          >
             Register Student
           </button>
         </div>
